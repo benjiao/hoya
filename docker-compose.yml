@@ -16,6 +16,7 @@ services:
 
   migrate:
     build: api/
+    image: hoya-api
     command: python manage.py migrate --noinput
     volumes:
       - ${API_SRC:-./api}:/app
@@ -29,6 +30,7 @@ services:
 
   api:
     build: api/
+    image: hoya-api
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ${API_SRC:-./api}:/app
@@ -46,6 +48,7 @@ services:
 
   web:
     build: web/
+    image: hoya-web
     ports:
       - "${WEB_PORT:-5173}:5173"
     volumes:

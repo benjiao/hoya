@@ -13,6 +13,7 @@ build/
 local_settings.py
 db.sqlite3
 api/media/
+media/
 
 # Environment
 .env

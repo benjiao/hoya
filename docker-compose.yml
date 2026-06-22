@@ -3,15 +3,15 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_DB: hoya
-      POSTGRES_USER: hoya
-      POSTGRES_PASSWORD: hoya
+      POSTGRES_DB: ${POSTGRES_DB:-hoya}
+      POSTGRES_USER: ${POSTGRES_USER:-hoya}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hoya}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hoya -d hoya"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hoya} -d ${POSTGRES_DB:-hoya}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -20,10 +20,10 @@ services:
     build: ./api
     command: python manage.py migrate --noinput
     volumes:
-      - ./api:/app
+      - ${API_SRC:-./api}:/app
     environment:
-      DATABASE_URL: postgres://hoya:hoya@db:5432/hoya
-      SECRET_KEY: dev-secret-key-change-in-production
+      DATABASE_URL: ${DATABASE_URL:-postgres://hoya:hoya@db:5432/hoya}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
     depends_on:
       db:
         condition: service_healthy
@@ -33,13 +33,15 @@ services:
     build: ./api
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./api:/app
+      - ${API_SRC:-./api}:/app
+      - ${MEDIA_PATH:-media_data}:/media
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
     environment:
-      DATABASE_URL: postgres://hoya:hoya@db:5432/hoya
-      DEBUG: "true"
-      SECRET_KEY: dev-secret-key-change-in-production
+      DATABASE_URL: ${DATABASE_URL:-postgres://hoya:hoya@db:5432/hoya}
+      DEBUG: ${DEBUG:-true}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      MEDIA_ROOT: ${MEDIA_ROOT:-/media}
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -47,14 +49,15 @@ services:
   web:
     build: ./web
     ports:
-      - "5173:5173"
+      - "${WEB_PORT:-5173}:5173"
     volumes:
-      - ./web:/app
+      - ${WEB_SRC:-./web}:/app
       - /app/node_modules
     environment:
-      VITE_API_URL: http://localhost:8000/api/
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/}
     depends_on:
       - api
 
 volumes:
   postgres_data:
+  media_data:

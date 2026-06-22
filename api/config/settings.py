@@ -130,7 +130,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/admin/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
@@ -156,7 +156,7 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS', 'http://localhost:5173'
 ).split(',')
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/api/media/'
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', str(BASE_DIR / 'media'))
 
 UNFOLD = {

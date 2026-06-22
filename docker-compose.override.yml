@@ -1,0 +1,12 @@
+services:
+  migrate:
+    volumes:
+      - ./api:/app
+
+  api:
+    volumes:
+      - ./api:/app
+
+  web:
+    volumes:
+      - ./web:/app

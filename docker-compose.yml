@@ -18,8 +18,6 @@ services:
     build: api/
     image: hoya-api
     command: python manage.py migrate --noinput
-    volumes:
-      - ${API_SRC:-./api}:/app
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgres://hoya:hoya@db:5432/hoya}
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
@@ -33,7 +31,6 @@ services:
     image: hoya-api
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ${API_SRC:-./api}:/app
       - ${MEDIA_PATH:-media_data}:/media
     ports:
       - "${API_PORT:-8000}:8000"
@@ -52,7 +49,6 @@ services:
     ports:
       - "${WEB_PORT:-5173}:5173"
     volumes:
-      - ${WEB_SRC:-./web}:/app
       - /app/node_modules
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api/}

@@ -1,13 +1,13 @@
 services:
   db:
-    image: postgres:16
+    image: postgres:18
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-hoya}
       POSTGRES_USER: ${POSTGRES_USER:-hoya}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hoya}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hoya} -d ${POSTGRES_DB:-hoya}"]
       interval: 5s
@@ -15,7 +15,7 @@ services:
       retries: 5
 
   migrate:
-    build: ./api
+    build: api/
     command: python manage.py migrate --noinput
     volumes:
       - ${API_SRC:-./api}:/app
@@ -28,7 +28,7 @@ services:
     restart: on-failure
 
   api:
-    build: ./api
+    build: api/
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ${API_SRC:-./api}:/app
@@ -45,7 +45,7 @@ services:
         condition: service_completed_successfully
 
   web:
-    build: ./web
+    build: web/
     ports:
       - "${WEB_PORT:-5173}:5173"
     volumes:

@@ -37,6 +37,7 @@ services:
       DEBUG: ${DEBUG:-true}
       SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
       MEDIA_ROOT: ${MEDIA_ROOT:-/media}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
     depends_on:
       migrate:
         condition: service_completed_successfully

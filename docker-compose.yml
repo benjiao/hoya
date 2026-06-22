@@ -16,7 +16,6 @@ services:
 
   migrate:
     build: api/
-    image: hoya-api
     command: python manage.py migrate --noinput
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgres://hoya:hoya@db:5432/hoya}
@@ -28,7 +27,6 @@ services:
 
   api:
     build: api/
-    image: hoya-api
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ${MEDIA_PATH:-media_data}:/media
@@ -45,7 +43,6 @@ services:
 
   web:
     build: web/
-    image: hoya-web
     ports:
       - "${WEB_PORT:-5173}:5173"
     volumes:

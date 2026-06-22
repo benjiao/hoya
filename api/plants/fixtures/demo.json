@@ -1,0 +1,375 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$5rIifeluCciXzycVicIxkY$ddN6R7jjx1AMXIyGbS3bFjdDvAheNDSnejxLcoaU7vc=",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "demo",
+      "first_name": "Demo",
+      "last_name": "Gardener",
+      "email": "demo@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-05-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "plants.location",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "name": "Home",
+      "parent": null,
+      "created_at": "2026-05-01T10:00:00Z",
+      "updated_at": "2026-05-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "plants.location",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "name": "Living Room",
+      "parent": 1,
+      "created_at": "2026-05-01T10:05:00Z",
+      "updated_at": "2026-05-01T10:05:00Z"
+    }
+  },
+  {
+    "model": "plants.location",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "name": "Window Sill",
+      "parent": 2,
+      "created_at": "2026-05-01T10:10:00Z",
+      "updated_at": "2026-05-01T10:10:00Z"
+    }
+  },
+  {
+    "model": "plants.location",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "name": "Balcony",
+      "parent": 1,
+      "created_at": "2026-05-01T10:15:00Z",
+      "updated_at": "2026-05-01T10:15:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "location": 3,
+      "name": "Monstera",
+      "scientific_name": "Monstera deliciosa",
+      "created_at": "2026-05-02T09:00:00Z",
+      "updated_at": "2026-05-02T09:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "location": 2,
+      "name": "Snake Plant",
+      "scientific_name": "Dracaena trifasciata",
+      "created_at": "2026-05-02T09:05:00Z",
+      "updated_at": "2026-05-02T09:05:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "location": 3,
+      "name": "Pothos",
+      "scientific_name": "Epipremnum aureum",
+      "created_at": "2026-05-02T09:10:00Z",
+      "updated_at": "2026-05-02T09:10:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "location": 2,
+      "name": "Fiddle Leaf Fig",
+      "scientific_name": "Ficus lyrata",
+      "created_at": "2026-05-02T09:15:00Z",
+      "updated_at": "2026-05-02T09:15:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 5,
+    "fields": {
+      "user": 1,
+      "location": 4,
+      "name": "Jade Plant",
+      "scientific_name": "Crassula ovata",
+      "created_at": "2026-05-02T09:20:00Z",
+      "updated_at": "2026-05-02T09:20:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 1,
+    "fields": {
+      "plant": 3,
+      "type": "repotted",
+      "notes": "Moved to a larger pot with fresh soil.",
+      "logged_at": "2026-05-22T11:00:00Z",
+      "created_at": "2026-05-22T11:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 2,
+    "fields": {
+      "plant": 1,
+      "type": "watered",
+      "notes": "Top inch of soil was dry.",
+      "logged_at": "2026-05-22T18:00:00Z",
+      "created_at": "2026-05-22T18:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 3,
+    "fields": {
+      "plant": 3,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-05-23T09:30:00Z",
+      "created_at": "2026-05-23T09:30:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 4,
+    "fields": {
+      "plant": 4,
+      "type": "watered",
+      "notes": "Watered until drainage.",
+      "logged_at": "2026-05-24T10:00:00Z",
+      "created_at": "2026-05-24T10:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 5,
+    "fields": {
+      "plant": 2,
+      "type": "watered",
+      "notes": "Light watering; drought tolerant.",
+      "logged_at": "2026-05-28T17:00:00Z",
+      "created_at": "2026-05-28T17:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 6,
+    "fields": {
+      "plant": 1,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-05-29T18:00:00Z",
+      "created_at": "2026-05-29T18:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 7,
+    "fields": {
+      "plant": 3,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-05-30T09:00:00Z",
+      "created_at": "2026-05-30T09:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 8,
+    "fields": {
+      "plant": 4,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-05-31T10:30:00Z",
+      "created_at": "2026-05-31T10:30:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 9,
+    "fields": {
+      "plant": 5,
+      "type": "watered",
+      "notes": "Small amount; avoid overwatering.",
+      "logged_at": "2026-06-01T08:00:00Z",
+      "created_at": "2026-06-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 10,
+    "fields": {
+      "plant": 1,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-05T18:30:00Z",
+      "created_at": "2026-06-05T18:30:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 11,
+    "fields": {
+      "plant": 3,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-06T09:15:00Z",
+      "created_at": "2026-06-06T09:15:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 12,
+    "fields": {
+      "plant": 4,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-07T11:00:00Z",
+      "created_at": "2026-06-07T11:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 13,
+    "fields": {
+      "plant": 2,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-11T16:45:00Z",
+      "created_at": "2026-06-11T16:45:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 14,
+    "fields": {
+      "plant": 1,
+      "type": "repotted",
+      "notes": "Added moss pole and refreshed top dressing.",
+      "logged_at": "2026-06-10T14:00:00Z",
+      "created_at": "2026-06-10T14:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 15,
+    "fields": {
+      "plant": 1,
+      "type": "watered",
+      "notes": "Post-repot light watering.",
+      "logged_at": "2026-06-12T18:00:00Z",
+      "created_at": "2026-06-12T18:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 16,
+    "fields": {
+      "plant": 3,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-13T09:45:00Z",
+      "created_at": "2026-06-13T09:45:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 17,
+    "fields": {
+      "plant": 4,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-14T10:15:00Z",
+      "created_at": "2026-06-14T10:15:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 18,
+    "fields": {
+      "plant": 1,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-19T17:30:00Z",
+      "created_at": "2026-06-19T17:30:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 19,
+    "fields": {
+      "plant": 3,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-20T09:00:00Z",
+      "created_at": "2026-06-20T09:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 20,
+    "fields": {
+      "plant": 4,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-21T10:00:00Z",
+      "created_at": "2026-06-21T10:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 21,
+    "fields": {
+      "plant": 1,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-21T18:00:00Z",
+      "created_at": "2026-06-21T18:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 22,
+    "fields": {
+      "plant": 5,
+      "type": "watered",
+      "notes": "",
+      "logged_at": "2026-06-21T08:30:00Z",
+      "created_at": "2026-06-21T08:30:00Z"
+    }
+  },
+  {
+    "model": "plants.plantcarelog",
+    "pk": 23,
+    "fields": {
+      "plant": 5,
+      "type": "repotted",
+      "notes": "Repotted into gritty succulent mix.",
+      "logged_at": "2026-06-15T13:00:00Z",
+      "created_at": "2026-06-15T13:00:00Z"
+    }
+  }
+]

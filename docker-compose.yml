@@ -1,0 +1,60 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hoya
+      POSTGRES_USER: hoya
+      POSTGRES_PASSWORD: hoya
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hoya -d hoya"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    build: ./api
+    command: python manage.py migrate --noinput
+    volumes:
+      - ./api:/app
+    environment:
+      DATABASE_URL: postgres://hoya:hoya@db:5432/hoya
+      SECRET_KEY: dev-secret-key-change-in-production
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+  api:
+    build: ./api
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./api:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://hoya:hoya@db:5432/hoya
+      DEBUG: "true"
+      SECRET_KEY: dev-secret-key-change-in-production
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  web:
+    build: ./web
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: http://localhost:8000/api/
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

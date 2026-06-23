@@ -1,5 +1,11 @@
 <template>
   <div>
+    <ConfirmDialog
+      v-if="pendingDeleteId"
+      message="Delete this care log entry?"
+      @confirm="confirmDelete"
+      @cancel="pendingDeleteId = null"
+    />
     <LoadingSpinner v-if="loading" />
     <p v-else-if="!logs.length" class="text-sm text-gray-400">No care entries yet.</p>
     <ul v-else class="space-y-2">
@@ -18,7 +24,7 @@
           <p v-if="log.notes" class="text-gray-600 mt-1">{{ log.notes }}</p>
         </div>
         <button
-          @click="remove(log.id)"
+          @click="pendingDeleteId = log.id"
           class="text-gray-300 hover:text-red-500 ml-4 flex-shrink-0 text-xs"
         >Delete</button>
       </li>
@@ -31,11 +37,13 @@ import { ref, onMounted } from 'vue'
 import { usePlantsStore } from '@/stores/plants'
 import { useDateFormat } from '@/composables/useDateFormat'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 
 const props = defineProps({ plantId: [String, Number] })
 const store = usePlantsStore()
 const logs = ref([])
 const loading = ref(false)
+const pendingDeleteId = ref(null)
 const { shortDate } = useDateFormat()
 
 async function refresh() {
@@ -44,9 +52,10 @@ async function refresh() {
   loading.value = false
 }
 
-async function remove(logId) {
-  await store.deleteLog(props.plantId, logId)
-  logs.value = logs.value.filter(l => l.id !== logId)
+async function confirmDelete() {
+  await store.deleteLog(props.plantId, pendingDeleteId.value)
+  logs.value = logs.value.filter(l => l.id !== pendingDeleteId.value)
+  pendingDeleteId.value = null
 }
 
 onMounted(refresh)

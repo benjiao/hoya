@@ -13,7 +13,7 @@
           class="w-full h-full object-cover rounded-lg"
         />
         <button
-          @click.stop="remove(img.id)"
+          @click.stop="pendingDeleteId = img.id"
           class="absolute top-1 right-1 bg-black/60 text-white text-xs rounded px-1 opacity-0 group-hover:opacity-100 transition"
           title="Remove"
         >&times;</button>
@@ -44,6 +44,12 @@
     <p v-if="uploadError" class="text-xs text-red-600 mt-1">{{ uploadError }}</p>
 
     <Teleport to="body">
+      <ConfirmDialog
+        v-if="pendingDeleteId"
+        message="Delete this photo?"
+        @confirm="confirmDelete"
+        @cancel="pendingDeleteId = null"
+      />
       <div
         v-if="selected"
         class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
@@ -70,12 +76,14 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { usePlantsStore } from '@/stores/plants'
 import { extractError } from '@/composables/useApiRequest'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 
 const props = defineProps({ plant: Object })
 const store = usePlantsStore()
 const uploading = ref(false)
 const uploadError = ref(null)
 const selected = ref(null)
+const pendingDeleteId = ref(null)
 
 const effectiveThumbnailId = computed(() =>
   props.plant.thumbnail_image_id ?? props.plant.images[0]?.id ?? null
@@ -103,8 +111,9 @@ async function upload(e) {
   }
 }
 
-async function remove(imageId) {
-  await store.deleteImage(props.plant.id, imageId)
+async function confirmDelete() {
+  await store.deleteImage(props.plant.id, pendingDeleteId.value)
+  pendingDeleteId.value = null
 }
 
 async function setThumbnail(img) {

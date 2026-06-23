@@ -4,7 +4,8 @@
       <div
         v-for="img in plant.images"
         :key="img.id"
-        class="relative group w-28 h-28"
+        class="relative group w-28 h-28 cursor-pointer"
+        @click="open(img)"
       >
         <img
           :src="img.image"
@@ -12,7 +13,7 @@
           class="w-full h-full object-cover rounded-lg"
         />
         <button
-          @click="remove(img.id)"
+          @click.stop="remove(img.id)"
           class="absolute top-1 right-1 bg-black/60 text-white text-xs rounded px-1 opacity-0 group-hover:opacity-100 transition"
           title="Remove"
         >&times;</button>
@@ -29,11 +30,32 @@
       {{ uploading ? 'Uploading…' : '+ Add photo' }}
     </label>
     <p v-if="uploadError" class="text-xs text-red-600 mt-1">{{ uploadError }}</p>
+
+    <Teleport to="body">
+      <div
+        v-if="selected"
+        class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+        @click.self="close"
+      >
+        <button
+          @click="close"
+          class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300"
+        >&times;</button>
+        <div class="flex flex-col items-center max-w-[90vw] max-h-[90vh]">
+          <img
+            :src="selected.image"
+            :alt="selected.caption || plant.name"
+            class="max-w-full max-h-[85vh] object-contain rounded-lg"
+          />
+          <p v-if="selected.caption" class="text-white text-sm mt-2">{{ selected.caption }}</p>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { usePlantsStore } from '@/stores/plants'
 import { extractError } from '@/composables/useApiRequest'
 
@@ -41,6 +63,14 @@ const props = defineProps({ plant: Object })
 const store = usePlantsStore()
 const uploading = ref(false)
 const uploadError = ref(null)
+const selected = ref(null)
+
+function open(img) { selected.value = img }
+function close() { selected.value = null }
+
+function onKeydown(e) { if (e.key === 'Escape') close() }
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 
 async function upload(e) {
   const file = e.target.files[0]

@@ -4,7 +4,11 @@
     @click="$router.push(`/plants/${plant.id}`)"
   >
     <!-- Thumbnail -->
-    <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+    <div
+      class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100"
+      :class="{ 'cursor-zoom-in': plant.thumbnail }"
+      @click.stop="plant.thumbnail && (lightbox = true)"
+    >
       <img
         v-if="plant.thumbnail"
         :src="plant.thumbnail"
@@ -16,6 +20,24 @@
         class="w-full h-full flex items-center justify-center text-3xl text-gray-300"
       >🌱</div>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="lightbox"
+        class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+        @click.self="lightbox = false"
+      >
+        <button
+          @click="lightbox = false"
+          class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300"
+        >&times;</button>
+        <img
+          :src="plant.thumbnail"
+          :alt="plant.name"
+          class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
+        />
+      </div>
+    </Teleport>
 
     <!-- Content -->
     <div class="flex flex-col gap-1 flex-1 min-w-0">
@@ -59,10 +81,16 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useDateFormat } from '@/composables/useDateFormat'
 
 defineProps({ plant: Object })
 defineEmits(['edit', 'delete'])
 
 const { relativeTime, shortDate } = useDateFormat()
+
+const lightbox = ref(false)
+function onKeydown(e) { if (e.key === 'Escape') lightbox.value = false }
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 </script>

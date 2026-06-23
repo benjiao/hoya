@@ -67,12 +67,19 @@ class PlantSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True,
     )
+    thumbnail_image_id = serializers.PrimaryKeyRelatedField(
+        source='thumbnail_image',
+        queryset=PlantImage.objects.none(),
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = Plant
         fields = [
             'id', 'name', 'scientific_name',
             'location', 'location_id',
+            'thumbnail_image_id',
             'images', 'created_at', 'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
@@ -82,6 +89,7 @@ class PlantSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             self.fields['location_id'].queryset = Location.objects.filter(user=request.user)
+            self.fields['thumbnail_image_id'].queryset = PlantImage.objects.filter(plant__user=request.user)
 
 
 class PlantListSerializer(serializers.ModelSerializer):
@@ -105,11 +113,11 @@ class PlantListSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
     def get_thumbnail(self, obj):
-        first = obj.images.order_by('uploaded_at').first()
-        if not first:
+        img = obj.thumbnail_image if obj.thumbnail_image_id else obj.images.order_by('uploaded_at').first()
+        if not img:
             return None
         request = self.context.get('request')
-        return request.build_absolute_uri(first.image.url) if request else first.image.url
+        return request.build_absolute_uri(img.image.url) if request else img.image.url
 
     def get_location_display_name(self, obj):
         if obj.location_id is None:

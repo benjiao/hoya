@@ -10,6 +10,7 @@
       >
         <div>
           <span
+            v-if="log.type"
             :class="log.type === 'watered' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'"
             class="text-xs font-medium px-2 py-0.5 rounded-full capitalize mr-2"
           >{{ log.type }}</span>

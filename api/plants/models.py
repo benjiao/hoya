@@ -60,6 +60,9 @@ class Plant(models.Model):
     )
     name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255, blank=True)
+    thumbnail_image = models.ForeignKey(
+        'PlantImage', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -86,10 +89,11 @@ class PlantCareLog(models.Model):
     ]
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name='care_logs')
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True, default=None)
     notes = models.TextField(blank=True)
     logged_at = models.DateTimeField(default=timezone.now)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.plant.name} — {self.get_type_display()} on {self.logged_at:%Y-%m-%d}"
+        type_label = self.get_type_display() or 'Note'
+        return f"{self.plant.name} — {type_label} on {self.logged_at:%Y-%m-%d}"

@@ -53,6 +53,7 @@ class PlantViewSet(viewsets.ModelViewSet):
                 'location__parent',
                 'location__parent__parent',
                 'location__parent__parent__parent',
+                'thumbnail_image',
             )
             .annotate(last_watered=last_watered, last_repotted=last_repotted)
             .order_by('name')
@@ -74,7 +75,9 @@ class PlantViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             serializer = PlantImageSerializer(data=request.data, context=ctx)
             serializer.is_valid(raise_exception=True)
-            serializer.save(plant=plant)
+            image = serializer.save(plant=plant)
+            plant.thumbnail_image = image
+            plant.save(update_fields=['thumbnail_image'])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         serializer = PlantImageSerializer(plant.images.all(), many=True, context=ctx)
         return Response(serializer.data)

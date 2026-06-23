@@ -2,12 +2,12 @@
   <BaseModal title="Log care" @close="$emit('close')">
     <form @submit.prevent="submit" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
         <select
           v-model="form.type"
-          required
           class="w-full rounded-md border-gray-300 shadow-sm focus:ring-brand-500 focus:border-brand-500"
         >
+          <option :value="null">— General note —</option>
           <option value="watered">Watered</option>
           <option value="repotted">Repotted</option>
         </select>
@@ -61,7 +61,7 @@ const now = new Date()
 now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
 
 const form = reactive({
-  type: 'watered',
+  type: null,
   logged_at: now.toISOString().slice(0, 16),
   notes: '',
 })

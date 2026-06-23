@@ -17,6 +17,18 @@
           class="absolute top-1 right-1 bg-black/60 text-white text-xs rounded px-1 opacity-0 group-hover:opacity-100 transition"
           title="Remove"
         >&times;</button>
+        <!-- Thumbnail indicator -->
+        <span
+          v-if="img.id === effectiveThumbnailId"
+          class="absolute bottom-1 left-1 bg-black/60 text-white text-xs rounded px-1 pointer-events-none"
+        >★</span>
+        <!-- Set as thumbnail button (non-thumbnail images only) -->
+        <button
+          v-else
+          @click.stop="setThumbnail(img)"
+          class="absolute bottom-1 left-1 bg-black/60 text-white text-xs rounded px-1 opacity-0 group-hover:opacity-100 transition"
+          title="Set as thumbnail"
+        >★</button>
       </div>
     </div>
     <label class="cursor-pointer inline-flex items-center gap-1 text-sm text-brand-600 hover:underline">
@@ -55,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { usePlantsStore } from '@/stores/plants'
 import { extractError } from '@/composables/useApiRequest'
 
@@ -64,6 +76,10 @@ const store = usePlantsStore()
 const uploading = ref(false)
 const uploadError = ref(null)
 const selected = ref(null)
+
+const effectiveThumbnailId = computed(() =>
+  props.plant.thumbnail_image_id ?? props.plant.images[0]?.id ?? null
+)
 
 function open(img) { selected.value = img }
 function close() { selected.value = null }
@@ -89,5 +105,9 @@ async function upload(e) {
 
 async function remove(imageId) {
   await store.deleteImage(props.plant.id, imageId)
+}
+
+async function setThumbnail(img) {
+  await store.setThumbnail(props.plant.id, img.id, img.image)
 }
 </script>

@@ -64,12 +64,10 @@ export const usePlantsStore = defineStore('plants', () => {
     })
     if (currentPlant.value?.id === plantId) {
       currentPlant.value.images.push(data)
+      currentPlant.value.thumbnail_image_id = data.id
     }
-    // Keep list thumbnail in sync when the first image is added
     const idx = plants.value.findIndex(p => p.id === plantId)
-    if (idx !== -1 && !plants.value[idx].thumbnail) {
-      plants.value[idx] = { ...plants.value[idx], thumbnail: data.image }
-    }
+    if (idx !== -1) plants.value[idx] = { ...plants.value[idx], thumbnail: data.image }
     return data
   }
 
@@ -77,7 +75,15 @@ export const usePlantsStore = defineStore('plants', () => {
     await client.delete(`plants/${plantId}/images/${imageId}/`)
     if (currentPlant.value?.id === plantId) {
       currentPlant.value.images = currentPlant.value.images.filter(i => i.id !== imageId)
+      if (currentPlant.value.thumbnail_image_id === imageId) currentPlant.value.thumbnail_image_id = null
     }
+  }
+
+  async function setThumbnail(plantId, imageId, imageUrl) {
+    await client.patch(`plants/${plantId}/`, { thumbnail_image_id: imageId })
+    if (currentPlant.value?.id === plantId) currentPlant.value.thumbnail_image_id = imageId
+    const idx = plants.value.findIndex(p => p.id === plantId)
+    if (idx !== -1) plants.value[idx] = { ...plants.value[idx], thumbnail: imageUrl }
   }
 
   async function fetchLogs(plantId) {
@@ -97,6 +103,6 @@ export const usePlantsStore = defineStore('plants', () => {
   return {
     plants, currentPlant, loading, error,
     fetchAll, fetchOne, create, update, remove,
-    uploadImage, deleteImage, fetchLogs, addLog, deleteLog,
+    uploadImage, deleteImage, setThumbnail, fetchLogs, addLog, deleteLog,
   }
 })

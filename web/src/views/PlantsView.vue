@@ -106,6 +106,7 @@ const displayedPlants = computed(() => {
     if (sortBy.value === 'name_desc') return b.name.localeCompare(a.name)
     if (sortBy.value === 'last_watered_desc' || sortBy.value === 'last_watered_asc') {
       const asc = sortBy.value === 'last_watered_asc'
+      if (a.location_skip_watering !== b.location_skip_watering) return a.location_skip_watering ? 1 : -1
       if (!a.last_watered && !b.last_watered) return 0
       if (!a.last_watered) return asc ? -1 : 1
       if (!b.last_watered) return asc ? 1 : -1

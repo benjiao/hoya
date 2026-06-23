@@ -10,6 +10,12 @@
         />
       </div>
       <div>
+        <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <input type="checkbox" v-model="form.skip_watering" class="rounded" />
+          Skip watering monitoring (e.g. prop box, storage)
+        </label>
+      </div>
+      <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Parent location</label>
         <select
           v-model="form.parent_id"
@@ -54,6 +60,7 @@ const { loading, error, run } = useApiRequest()
 const form = reactive({
   name: props.location?.name || '',
   parent_id: props.location?.parent?.id ?? props.parentId ?? null,
+  skip_watering: props.location?.skip_watering ?? false,
 })
 
 // Exclude the location being edited to prevent self-reference cycles

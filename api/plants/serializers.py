@@ -21,6 +21,7 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'parent', 'parent_id',
             'path_names', 'display_name',
+            'skip_watering',
             'children_url', 'created_at', 'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at']
@@ -87,6 +88,7 @@ class PlantListSerializer(serializers.ModelSerializer):
     location_name = serializers.CharField(source='location.name', read_only=True, default=None)
     location_display_name = serializers.SerializerMethodField()
     location_path_names = serializers.SerializerMethodField()
+    location_skip_watering = serializers.BooleanField(source='location.skip_watering', read_only=True, default=False)
     last_watered = serializers.DateTimeField(read_only=True, allow_null=True)
     last_repotted = serializers.DateTimeField(read_only=True, allow_null=True)
     thumbnail = serializers.SerializerMethodField()
@@ -95,7 +97,7 @@ class PlantListSerializer(serializers.ModelSerializer):
         model = Plant
         fields = [
             'id', 'name', 'scientific_name',
-            'location_name', 'location_display_name', 'location_path_names',
+            'location_name', 'location_display_name', 'location_path_names', 'location_skip_watering',
             'last_watered', 'last_repotted',
             'thumbnail',
             'created_at', 'updated_at',

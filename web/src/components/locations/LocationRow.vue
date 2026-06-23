@@ -5,7 +5,10 @@
       :style="{ paddingLeft: `${depth * 1.25 + 0.75}rem` }"
     >
       <div class="flex items-center gap-2">
-        <span class="text-sm font-medium text-gray-800">{{ node.name }}</span>
+        <RouterLink
+          :to="`/locations/${node.id}`"
+          class="text-sm font-medium text-gray-800 hover:text-brand-600"
+        >{{ node.name }}</RouterLink>
         <span v-if="node.children.length" class="text-xs text-gray-400">
           ({{ node.children.length }})
         </span>

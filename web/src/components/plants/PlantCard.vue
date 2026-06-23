@@ -66,7 +66,7 @@
 
       <div class="flex gap-2 flex-wrap mt-auto">
         <span
-          v-if="plant.last_watered"
+          v-if="plant.last_watered && !plant.location_skip_watering"
           class="inline-flex items-center text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5"
           :title="shortDate(plant.last_watered)"
         >Watered {{ relativeTime(plant.last_watered) }}</span>

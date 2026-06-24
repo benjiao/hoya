@@ -74,18 +74,23 @@ class Plant(models.Model):
 
 
 def _extract_exif_datetime(image_field):
+    import io
+    import datetime
+    import logging
     try:
-        import datetime
         from PIL import Image as PilImage
+        data = image_field.read()
         image_field.seek(0)
-        img = PilImage.open(image_field)
+        img = PilImage.open(io.BytesIO(data))
         exif = img.getexif()
-        dt_str = exif.get(36867) or exif.get(36868)  # DateTimeOriginal / DateTimeDigitized
+        exif_ifd = exif.get_ifd(0x8769)  # ExifIFD sub-dict where DateTimeOriginal lives
+        dt_str = (exif.get(36867) or exif.get(36868)
+                  or exif_ifd.get(36867) or exif_ifd.get(36868))
         if dt_str:
             naive = datetime.datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S')
             return timezone.make_aware(naive)
     except Exception:
-        pass
+        logging.exception('EXIF extraction failed')
     return None
 
 

@@ -1,3 +1,6 @@
+import os
+import re
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -70,11 +73,40 @@ class Plant(models.Model):
         return self.name
 
 
+def _extract_exif_datetime(image_field):
+    try:
+        import datetime
+        from PIL import Image as PilImage
+        image_field.seek(0)
+        img = PilImage.open(image_field)
+        exif = img.getexif()
+        dt_str = exif.get(36867) or exif.get(36868)  # DateTimeOriginal / DateTimeDigitized
+        if dt_str:
+            naive = datetime.datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S')
+            return timezone.make_aware(naive)
+    except Exception:
+        pass
+    return None
+
+
+def plant_image_upload_to(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    slug = re.sub(r'[^\w]+', '-', instance.plant.name).strip('-').lower()
+    dt = timezone.now().strftime('%Y%m%dT%H%M%S')
+    return f'plants/images/{slug}-{dt}{ext}'
+
+
 class PlantImage(models.Model):
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='plants/images/')
+    image = models.ImageField(upload_to=plant_image_upload_to)
     caption = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    taken_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk and self.taken_at is None:
+            self.taken_at = _extract_exif_datetime(self.image) or timezone.now()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.plant.name} image {self.pk}"

@@ -55,7 +55,7 @@ class LocationAdmin(ModelAdmin):
 class PlantImageInline(TabularInline):
     model = PlantImage
     extra = 0
-    readonly_fields = ['uploaded_at']
+    readonly_fields = ['uploaded_at', 'taken_at']
 
 
 class PlantCareLogInline(TabularInline):
@@ -121,6 +121,22 @@ class PlantAdmin(ModelAdmin):
     @admin.display(description='Last repotted', ordering='last_repotted')
     def last_repotted(self, obj):
         return obj.last_repotted
+
+
+@admin.register(PlantImage)
+class PlantImageAdmin(ModelAdmin):
+    list_display = ['id', 'plant', 'image_preview', 'caption', 'taken_at', 'uploaded_at']
+    list_filter = [('plant__user', UserDropdownFilter), ('taken_at', RangeDateFilter), ('uploaded_at', RangeDateFilter)]
+    search_fields = ['plant__name', 'caption']
+    readonly_fields = ['image_preview', 'uploaded_at', 'taken_at']
+    ordering = ['-taken_at']
+
+    @admin.display(description='Preview')
+    def image_preview(self, obj):
+        from django.utils.html import format_html
+        if obj.image:
+            return format_html('<img src="{}" style="height:60px;border-radius:4px;">', obj.image.url)
+        return '—'
 
 
 @admin.register(PlantCareLog)

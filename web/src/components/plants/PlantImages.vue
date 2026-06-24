@@ -2,7 +2,7 @@
   <div>
     <div class="flex flex-wrap gap-3 mb-3">
       <div
-        v-for="img in plant.images"
+        v-for="img in sortedImages"
         :key="img.id"
         class="relative group w-28 h-28 cursor-pointer"
         @click="open(img)"
@@ -59,6 +59,23 @@
           @click="close"
           class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300"
         >&times;</button>
+
+        <!-- Prev button -->
+        <button
+          v-if="currentIndex > 0"
+          @click.stop="prev"
+          class="absolute left-4 top-1/2 -translate-y-1/2 text-white text-4xl leading-none hover:text-gray-300 select-none px-2"
+          aria-label="Previous photo"
+        >&#8249;</button>
+
+        <!-- Next button -->
+        <button
+          v-if="currentIndex < sortedImages.length - 1"
+          @click.stop="next"
+          class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-4xl leading-none hover:text-gray-300 select-none px-2"
+          aria-label="Next photo"
+        >&#8250;</button>
+
         <div class="flex flex-col items-center max-w-[90vw] max-h-[90vh]">
           <img
             :src="selected.image"
@@ -66,6 +83,7 @@
             class="max-w-full max-h-[85vh] object-contain rounded-lg"
           />
           <p v-if="selected.caption" class="text-white text-sm mt-2">{{ selected.caption }}</p>
+          <p v-if="selected.taken_at" class="text-white/50 text-xs mt-1">{{ formatDate(selected.taken_at) }}</p>
         </div>
       </div>
     </Teleport>
@@ -85,14 +103,33 @@ const uploadError = ref(null)
 const selected = ref(null)
 const pendingDeleteId = ref(null)
 
+const sortedImages = computed(() =>
+  [...props.plant.images].sort((a, b) => new Date(b.taken_at) - new Date(a.taken_at))
+)
+
 const effectiveThumbnailId = computed(() =>
   props.plant.thumbnail_image_id ?? props.plant.images[0]?.id ?? null
 )
 
+const currentIndex = computed(() =>
+  selected.value ? sortedImages.value.findIndex(i => i.id === selected.value.id) : -1
+)
+
+function formatDate(dt) {
+  return dt ? new Date(dt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : ''
+}
+
 function open(img) { selected.value = img }
 function close() { selected.value = null }
+function prev() { if (currentIndex.value > 0) selected.value = sortedImages.value[currentIndex.value - 1] }
+function next() { if (currentIndex.value < sortedImages.value.length - 1) selected.value = sortedImages.value[currentIndex.value + 1] }
 
-function onKeydown(e) { if (e.key === 'Escape') close() }
+function onKeydown(e) {
+  if (!selected.value) return
+  if (e.key === 'Escape') close()
+  else if (e.key === 'ArrowLeft') prev()
+  else if (e.key === 'ArrowRight') next()
+}
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 

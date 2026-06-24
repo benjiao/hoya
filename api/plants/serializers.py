@@ -46,8 +46,8 @@ class LocationSerializer(serializers.ModelSerializer):
 class PlantImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlantImage
-        fields = ['id', 'image', 'caption', 'uploaded_at']
-        read_only_fields = ['uploaded_at']
+        fields = ['id', 'image', 'caption', 'uploaded_at', 'taken_at']
+        read_only_fields = ['uploaded_at', 'taken_at']
 
 
 class PlantCareLogSerializer(serializers.ModelSerializer):

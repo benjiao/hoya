@@ -1,8 +1,11 @@
 export function useDateFormat() {
   function relativeTime(dateStr) {
     if (!dateStr) return null
-    const diff = Date.now() - new Date(dateStr).getTime()
-    const days = Math.floor(diff / 86400000)
+    const now = new Date()
+    const then = new Date(dateStr)
+    const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const thenMidnight = new Date(then.getFullYear(), then.getMonth(), then.getDate())
+    const days = Math.round((nowMidnight - thenMidnight) / 86400000)
     if (days === 0) return 'Today'
     if (days === 1) return 'Yesterday'
     if (days < 7) return `${days} days ago`

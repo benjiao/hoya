@@ -73,16 +73,18 @@ class PlantSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True,
     )
+    last_watered = serializers.DateTimeField(read_only=True, allow_null=True)
 
     class Meta:
         model = Plant
         fields = [
             'id', 'name', 'scientific_name',
+            'watering_interval_days', 'last_watered',
             'location', 'location_id',
             'thumbnail_image_id',
             'images', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'watering_interval_days', 'last_watered']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -105,12 +107,13 @@ class PlantListSerializer(serializers.ModelSerializer):
         model = Plant
         fields = [
             'id', 'name', 'scientific_name',
+            'watering_interval_days',
             'location_name', 'location_display_name', 'location_path_names', 'location_skip_watering',
             'last_watered', 'last_repotted',
             'thumbnail',
             'created_at', 'updated_at',
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'watering_interval_days']
 
     def get_thumbnail(self, obj):
         img = obj.thumbnail_image if obj.thumbnail_image_id else obj.images.order_by('uploaded_at').first()

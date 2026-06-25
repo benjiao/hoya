@@ -21,5 +21,14 @@ export function useDateFormat() {
     })
   }
 
-  return { relativeTime, shortDate }
+  function daysSince(dateStr) {
+    if (!dateStr) return null
+    const now = new Date()
+    const then = new Date(dateStr)
+    const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const thenMidnight = new Date(then.getFullYear(), then.getMonth(), then.getDate())
+    return Math.round((nowMidnight - thenMidnight) / 86400000)
+  }
+
+  return { relativeTime, shortDate, daysSince }
 }

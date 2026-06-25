@@ -64,12 +64,21 @@ class PlantCareLogInline(TabularInline):
     readonly_fields = ['created_at']
 
 
+@admin.action(description='Recompute watering intervals')
+def recompute_watering_intervals(modeladmin, request, queryset):
+    from .tasks import compute_watering_intervals
+    pks = list(queryset.values_list('pk', flat=True))
+    compute_watering_intervals.delay(plant_pks=pks)
+    modeladmin.message_user(request, f'Recomputing watering intervals for {len(pks)} plant(s).')
+
+
 @admin.register(Plant)
 class PlantAdmin(ModelAdmin):
+    actions = [recompute_watering_intervals]
     list_filter_submit = True
     list_display = [
         'name', 'scientific_name', 'location_path', 'user',
-        'last_watered', 'last_repotted', 'created_at',
+        'last_watered', 'last_repotted', 'watering_interval_days', 'created_at',
     ]
     list_filter = [
         ('name', AllValuesCheckboxFilter),

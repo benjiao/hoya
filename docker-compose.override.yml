@@ -7,6 +7,14 @@ services:
     volumes:
       - ./api:/app
 
+  worker:
+    volumes:
+      - ./api:/app
+
+  beat:
+    volumes:
+      - ./api:/app
+
   web:
     volumes:
       - ./web:/app

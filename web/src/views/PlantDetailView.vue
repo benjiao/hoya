@@ -17,6 +17,20 @@
       </div>
     </div>
 
+    <section v-if="wateringProgress !== null" class="mb-6">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-sm font-medium text-gray-700">Watering</span>
+        <span class="text-xs text-gray-500">{{ wateringProgressLabel }}</span>
+      </div>
+      <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div
+          class="h-full rounded-full transition-all duration-300"
+          :class="wateringProgressColor"
+          :style="{ width: wateringProgressPct + '%' }"
+        />
+      </div>
+    </section>
+
     <section class="mb-8">
       <h2 class="text-base font-semibold text-gray-800 mb-3">Photos</h2>
       <PlantImages :plant="plant" />
@@ -58,6 +72,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePlantsStore } from '@/stores/plants'
+import { useDateFormat } from '@/composables/useDateFormat'
 import PlantModal from '@/components/plants/PlantModal.vue'
 import PlantImages from '@/components/plants/PlantImages.vue'
 import CareLogList from '@/components/plants/CareLogList.vue'
@@ -70,6 +85,35 @@ const props = defineProps({ id: String })
 const store = usePlantsStore()
 const router = useRouter()
 const plant = computed(() => store.currentPlant)
+const { daysSince } = useDateFormat()
+
+const wateringProgress = computed(() => {
+  const p = plant.value
+  if (!p?.watering_interval_days || !p?.last_watered) return null
+  return daysSince(p.last_watered) / p.watering_interval_days
+})
+
+const wateringProgressPct = computed(() =>
+  wateringProgress.value !== null ? Math.min(wateringProgress.value * 100, 100) : 0
+)
+
+const wateringProgressColor = computed(() => {
+  const p = wateringProgress.value
+  if (p === null) return ''
+  if (p >= 1) return 'bg-red-400'
+  if (p >= 0.75) return 'bg-amber-400'
+  return 'bg-blue-400'
+})
+
+const wateringProgressLabel = computed(() => {
+  const p = plant.value
+  if (!p?.watering_interval_days || !p?.last_watered) return ''
+  const days = daysSince(p.last_watered)
+  const interval = p.watering_interval_days
+  const remaining = Math.round(interval - days)
+  if (remaining <= 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} · every ${interval} days`
+  return `${days} of ${interval} days · due in ${remaining} day${remaining !== 1 ? 's' : ''}`
+})
 const showEdit = ref(false)
 const showLog = ref(false)
 const showDelete = ref(false)

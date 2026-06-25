@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'django_celery_beat',
     'plants',
 ]
 
@@ -158,6 +159,12 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
 
 MEDIA_URL = '/api/media/'
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', str(BASE_DIR / 'media'))
+
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://redis:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+WATERING_INTERVAL_WINDOW = int(os.environ.get('WATERING_INTERVAL_WINDOW', '10'))
 
 UNFOLD = {
     'SITE_TITLE': 'Hoya',

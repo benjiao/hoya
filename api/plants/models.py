@@ -63,6 +63,7 @@ class Plant(models.Model):
     )
     name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255, blank=True)
+    watering_interval_days = models.FloatField(null=True, blank=True)
     thumbnail_image = models.ForeignKey(
         'PlantImage', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
     )

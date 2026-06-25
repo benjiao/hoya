@@ -23,6 +23,7 @@
         <option value="name_desc">Z → A</option>
         <option value="last_watered_desc">Last watered ↓</option>
         <option value="last_watered_asc">Last watered ↑</option>
+        <option value="watering_due">Due for watering</option>
       </select>
     </div>
 
@@ -69,6 +70,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePlantsStore } from '@/stores/plants'
+import { useDateFormat } from '@/composables/useDateFormat'
 import PlantCard from '@/components/plants/PlantCard.vue'
 import PlantModal from '@/components/plants/PlantModal.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
@@ -82,12 +84,15 @@ const showCreate = ref(false)
 const editingPlant = ref(null)
 const deletingPlant = ref(null)
 
-const VALID_SORTS = ['name_asc', 'name_desc', 'last_watered_desc', 'last_watered_asc']
+const { daysSince } = useDateFormat()
+
+const VALID_SORTS = ['name_asc', 'name_desc', 'last_watered_desc', 'last_watered_asc', 'watering_due']
+const DEFAULT_SORT = 'watering_due'
 const search = ref(route.query.q || '')
-const sortBy = ref(VALID_SORTS.includes(route.query.sort) ? route.query.sort : 'last_watered_asc')
+const sortBy = ref(VALID_SORTS.includes(route.query.sort) ? route.query.sort : DEFAULT_SORT)
 
 watch([search, sortBy], ([q, sort]) => {
-  router.replace({ query: { ...(q ? { q } : {}), ...(sort !== 'last_watered_asc' ? { sort } : {}) } })
+  router.replace({ query: { ...(q ? { q } : {}), ...(sort !== DEFAULT_SORT ? { sort } : {}) } })
 })
 
 const displayedPlants = computed(() => {
@@ -112,6 +117,13 @@ const displayedPlants = computed(() => {
       if (!b.last_watered) return asc ? 1 : -1
       const diff = new Date(a.last_watered) - new Date(b.last_watered)
       return asc ? diff : -diff
+    }
+    if (sortBy.value === 'watering_due') {
+      const progress = p => {
+        if (p.location_skip_watering || !p.watering_interval_days || !p.last_watered) return -Infinity
+        return daysSince(p.last_watered) / p.watering_interval_days
+      }
+      return progress(b) - progress(a)
     }
     return a.name.localeCompare(b.name)
   })

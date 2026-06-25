@@ -119,11 +119,14 @@ const displayedPlants = computed(() => {
       return asc ? diff : -diff
     }
     if (sortBy.value === 'watering_due') {
-      const daysRemaining = p => {
-        if (p.location_skip_watering || !p.watering_interval_days || !p.last_watered) return Infinity
-        return p.watering_interval_days - daysSince(p.last_watered)
+      const key = p => {
+        if (p.location_skip_watering) return [2, 0]
+        if (!p.watering_interval_days || !p.last_watered) return [1, 0]
+        return [0, p.watering_interval_days - daysSince(p.last_watered)]
       }
-      return daysRemaining(a) - daysRemaining(b)
+      const [aPri, aVal] = key(a)
+      const [bPri, bVal] = key(b)
+      return aPri !== bPri ? aPri - bPri : aVal - bVal
     }
     return a.name.localeCompare(b.name)
   })

@@ -67,15 +67,15 @@
 
         <div class="flex gap-2 flex-wrap mt-auto">
           <span
-            v-if="plant.last_watered && !plant.location_skip_watering"
-            class="inline-flex items-center text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5"
-            :title="shortDate(plant.last_watered)"
-          >Watered {{ relativeTime(plant.last_watered) }}</span>
-          <span
             v-if="plant.last_repotted"
             class="inline-flex items-center text-xs bg-amber-50 text-amber-700 rounded-full px-2 py-0.5"
             :title="shortDate(plant.last_repotted)"
           >Repotted {{ relativeTime(plant.last_repotted) }}</span>
+          <span
+            v-if="plant.last_watered && !plant.location_skip_watering"
+            class="inline-flex items-center text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5"
+            :title="shortDate(plant.last_watered)"
+          >Watered {{ relativeTime(plant.last_watered) }}</span>
         </div>
       </div>
     </div>
@@ -114,15 +114,17 @@ const wateringProgress = computed(() => {
   return daysSince(props.plant.last_watered) / props.plant.watering_interval_days
 })
 
-const wateringProgressPct = computed(() =>
-  wateringProgress.value !== null ? Math.min(wateringProgress.value * 100, 100) : 0
-)
+const wateringProgressPct = computed(() => {
+  if (wateringProgress.value === null) return 0
+  if (daysSince(props.plant.last_watered) === 0) return 100
+  return Math.min(wateringProgress.value * 100, 100)
+})
 
 const wateringProgressColor = computed(() => {
-  const p = wateringProgress.value
-  if (p === null) return ''
-  if (p >= 1) return 'bg-red-400'
-  if (p >= 0.75) return 'bg-amber-400'
+  if (wateringProgress.value === null) return ''
+  if (daysSince(props.plant.last_watered) === 0) return 'bg-green-400'
+  if (wateringProgress.value >= 1) return 'bg-red-400'
+  if (wateringProgress.value >= 0.75) return 'bg-amber-400'
   return 'bg-blue-400'
 })
 

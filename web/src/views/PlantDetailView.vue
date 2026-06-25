@@ -93,15 +93,17 @@ const wateringProgress = computed(() => {
   return daysSince(p.last_watered) / p.watering_interval_days
 })
 
-const wateringProgressPct = computed(() =>
-  wateringProgress.value !== null ? Math.min(wateringProgress.value * 100, 100) : 0
-)
+const wateringProgressPct = computed(() => {
+  if (wateringProgress.value === null) return 0
+  if (daysSince(plant.value?.last_watered) === 0) return 100
+  return Math.min(wateringProgress.value * 100, 100)
+})
 
 const wateringProgressColor = computed(() => {
-  const p = wateringProgress.value
-  if (p === null) return ''
-  if (p >= 1) return 'bg-red-400'
-  if (p >= 0.75) return 'bg-amber-400'
+  if (wateringProgress.value === null) return ''
+  if (daysSince(plant.value?.last_watered) === 0) return 'bg-green-400'
+  if (wateringProgress.value >= 1) return 'bg-red-400'
+  if (wateringProgress.value >= 0.75) return 'bg-amber-400'
   return 'bg-blue-400'
 })
 

@@ -121,8 +121,8 @@ const displayedPlants = computed(() => {
     if (sortBy.value === 'watering_due') {
       const key = p => {
         if (p.location_skip_watering) return [3, 0]
-        if (!p.watering_interval_days || !p.last_watered) return [2, 0]
-        if (daysSince(p.last_watered) === 0) return [1, 0]
+        if (daysSince(p.last_watered) === 0) return [2, 0]
+        if (!p.watering_interval_days || !p.last_watered) return [1, 0]
         return [0, p.watering_interval_days - daysSince(p.last_watered)]
       }
       const [aPri, aVal] = key(a)

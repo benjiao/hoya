@@ -67,7 +67,7 @@ export const usePlantsStore = defineStore('plants', () => {
       currentPlant.value.thumbnail_image_id = data.id
     }
     const idx = plants.value.findIndex(p => p.id === plantId)
-    if (idx !== -1) plants.value[idx] = { ...plants.value[idx], thumbnail: data.image }
+    if (idx !== -1) plants.value[idx] = { ...plants.value[idx], thumbnail: data.thumbnail ?? data.image, full_image: data.image }
     return data
   }
 
@@ -79,11 +79,11 @@ export const usePlantsStore = defineStore('plants', () => {
     }
   }
 
-  async function setThumbnail(plantId, imageId, imageUrl) {
+  async function setThumbnail(plantId, imageId, thumbnailUrl, fullImageUrl) {
     await client.patch(`plants/${plantId}/`, { thumbnail_image_id: imageId })
     if (currentPlant.value?.id === plantId) currentPlant.value.thumbnail_image_id = imageId
     const idx = plants.value.findIndex(p => p.id === plantId)
-    if (idx !== -1) plants.value[idx] = { ...plants.value[idx], thumbnail: imageUrl }
+    if (idx !== -1) plants.value[idx] = { ...plants.value[idx], thumbnail: thumbnailUrl, full_image: fullImageUrl }
   }
 
   async function fetchLogs(plantId) {

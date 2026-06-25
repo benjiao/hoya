@@ -102,17 +102,50 @@ def plant_image_upload_to(instance, filename):
     return f'plants/images/{slug}-{dt}{ext}'
 
 
+def plant_thumbnail_upload_to(instance, filename):
+    slug = re.sub(r'[^\w]+', '-', instance.plant.name).strip('-').lower()
+    dt = timezone.now().strftime('%Y%m%dT%H%M%S')
+    return f'plants/thumbnails/{slug}-{dt}.webp'
+
+
 class PlantImage(models.Model):
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to=plant_image_upload_to)
+    thumbnail = models.ImageField(upload_to=plant_thumbnail_upload_to, blank=True)
     caption = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     taken_at = models.DateTimeField(null=True, blank=True)
 
+    def _generate_thumbnail(self, size=300):
+        import io
+        from PIL import Image as PilImage, ImageOps
+        from django.core.files.base import ContentFile
+
+        self.image.seek(0)
+        img = PilImage.open(io.BytesIO(self.image.read()))
+        img = ImageOps.exif_transpose(img)
+        img = img.convert('RGB')
+        img.thumbnail((size, size), PilImage.LANCZOS)
+
+        buf = io.BytesIO()
+        img.save(buf, format='WEBP', quality=85)
+        buf.seek(0)
+
+        thumb_name = plant_thumbnail_upload_to(self, self.image.name)
+        self.thumbnail.save(thumb_name, ContentFile(buf.read()), save=False)
+
     def save(self, *args, **kwargs):
         if not self.pk and self.taken_at is None:
             self.taken_at = _extract_exif_datetime(self.image) or timezone.now()
+        is_new = not self.pk
         super().save(*args, **kwargs)
+        if is_new and not self.thumbnail:
+            try:
+                self._generate_thumbnail()
+                PlantImage.objects.filter(pk=self.pk).update(thumbnail=self.thumbnail.name)
+            except Exception:
+                import logging
+                logging.exception('Thumbnail generation failed for PlantImage %s', self.pk)
 
     def __str__(self):
         return f"{self.plant.name} image {self.pk}"

@@ -8,7 +8,7 @@
         @click="open(img)"
       >
         <img
-          :src="img.image"
+          :src="img.thumbnail ?? img.image"
           :alt="img.caption || plant.name"
           class="w-full h-full object-cover rounded-lg"
         />
@@ -154,6 +154,6 @@ async function confirmDelete() {
 }
 
 async function setThumbnail(img) {
-  await store.setThumbnail(props.plant.id, img.id, img.image)
+  await store.setThumbnail(props.plant.id, img.id, img.thumbnail ?? img.image, img.image)
 }
 </script>

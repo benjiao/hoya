@@ -44,10 +44,17 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class PlantImageSerializer(serializers.ModelSerializer):
+    thumbnail = serializers.SerializerMethodField()
+
     class Meta:
         model = PlantImage
-        fields = ['id', 'image', 'caption', 'uploaded_at', 'taken_at']
+        fields = ['id', 'image', 'thumbnail', 'caption', 'uploaded_at', 'taken_at']
         read_only_fields = ['uploaded_at', 'taken_at']
+
+    def get_thumbnail(self, obj):
+        request = self.context.get('request')
+        url_field = obj.thumbnail if obj.thumbnail else obj.image
+        return request.build_absolute_uri(url_field.url) if request else url_field.url
 
 
 class PlantCareLogSerializer(serializers.ModelSerializer):
@@ -102,6 +109,7 @@ class PlantListSerializer(serializers.ModelSerializer):
     last_watered = serializers.DateTimeField(read_only=True, allow_null=True)
     last_repotted = serializers.DateTimeField(read_only=True, allow_null=True)
     thumbnail = serializers.SerializerMethodField()
+    full_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Plant
@@ -110,13 +118,24 @@ class PlantListSerializer(serializers.ModelSerializer):
             'watering_interval_days',
             'location_name', 'location_display_name', 'location_path_names', 'location_skip_watering',
             'last_watered', 'last_repotted',
-            'thumbnail',
+            'thumbnail', 'full_image',
             'created_at', 'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at', 'watering_interval_days']
 
+    def _resolve_thumbnail_image(self, obj):
+        return obj.thumbnail_image if obj.thumbnail_image_id else obj.images.order_by('uploaded_at').first()
+
     def get_thumbnail(self, obj):
-        img = obj.thumbnail_image if obj.thumbnail_image_id else obj.images.order_by('uploaded_at').first()
+        img = self._resolve_thumbnail_image(obj)
+        if not img:
+            return None
+        request = self.context.get('request')
+        url_field = img.thumbnail if img.thumbnail else img.image
+        return request.build_absolute_uri(url_field.url) if request else url_field.url
+
+    def get_full_image(self, obj):
+        img = self._resolve_thumbnail_image(obj)
         if not img:
             return None
         request = self.context.get('request')

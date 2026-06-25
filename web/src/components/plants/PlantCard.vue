@@ -33,7 +33,7 @@
             class="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300"
           >&times;</button>
           <img
-            :src="plant.thumbnail"
+            :src="plant.full_image ?? plant.thumbnail"
             :alt="plant.name"
             class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
           />

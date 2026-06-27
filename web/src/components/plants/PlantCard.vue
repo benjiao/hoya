@@ -134,7 +134,8 @@ const wateringProgressTitle = computed(() => {
   const days = daysSince(props.plant.last_watered)
   const interval = props.plant.watering_interval_days
   const remaining = Math.round(interval - days)
-  if (remaining <= 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} (every ${interval} days)`
+  if (remaining === 0) return `Due today (every ${interval} days)`
+  if (remaining < 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} (every ${interval} days)`
   return `Due in ${remaining} day${remaining !== 1 ? 's' : ''} (every ${interval} days)`
 })
 </script>

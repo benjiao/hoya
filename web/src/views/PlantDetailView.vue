@@ -95,13 +95,18 @@ const wateringProgress = computed(() => {
 
 const wateringProgressPct = computed(() => {
   if (wateringProgress.value === null) return 0
-  if (daysSince(plant.value?.last_watered) === 0) return 100
+  const days = daysSince(plant.value?.last_watered)
+  const remaining = Math.round((plant.value?.watering_interval_days ?? 0) - days)
+  if (days === 0 || remaining === 0) return 100
   return Math.min(wateringProgress.value * 100, 100)
 })
 
 const wateringProgressColor = computed(() => {
   if (wateringProgress.value === null) return ''
-  if (daysSince(plant.value?.last_watered) === 0) return 'bg-green-400'
+  const days = daysSince(plant.value?.last_watered)
+  const remaining = Math.round((plant.value?.watering_interval_days ?? 0) - days)
+  if (days === 0) return 'bg-green-400'
+  if (remaining === 0) return 'bg-red-400'
   if (wateringProgress.value >= 1) return 'bg-red-400'
   if (wateringProgress.value >= 0.75) return 'bg-amber-400'
   return 'bg-blue-400'
@@ -113,7 +118,8 @@ const wateringProgressLabel = computed(() => {
   const days = daysSince(p.last_watered)
   const interval = p.watering_interval_days
   const remaining = Math.round(interval - days)
-  if (remaining <= 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} · every ${interval} days`
+  if (remaining === 0) return `Due today · every ${interval} days`
+  if (remaining < 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} · every ${interval} days`
   return `${days} of ${interval} days · due in ${remaining} day${remaining !== 1 ? 's' : ''}`
 })
 const showEdit = ref(false)

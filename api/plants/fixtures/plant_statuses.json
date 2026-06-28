@@ -1,0 +1,5 @@
+[
+  {"model": "plants.plantstatus", "pk": 1, "fields": {"name": "Active", "collapse_in_list": false}},
+  {"model": "plants.plantstatus", "pk": 2, "fields": {"name": "Deceased", "collapse_in_list": true}},
+  {"model": "plants.plantstatus", "pk": 3, "fields": {"name": "Propagating", "collapse_in_list": false}}
+]

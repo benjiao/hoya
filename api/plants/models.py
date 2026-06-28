@@ -56,10 +56,24 @@ class Location(models.Model):
         return pks
 
 
+class PlantStatus(models.Model):
+    name = models.CharField(max_length=100)
+    collapse_in_list = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class Plant(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='plants')
     location = models.ForeignKey(
         Location, null=True, blank=True, on_delete=models.SET_NULL, related_name='plants'
+    )
+    status = models.ForeignKey(
+        'PlantStatus', null=True, blank=True, on_delete=models.SET_NULL, related_name='plants'
     )
     name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255, blank=True)

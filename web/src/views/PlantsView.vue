@@ -35,15 +35,37 @@
     <p v-else-if="displayedPlants.length === 0" class="text-gray-500 text-sm">
       No plants match your search.
     </p>
-    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <PlantCard
-        v-for="plant in displayedPlants"
-        :key="plant.id"
-        :plant="plant"
-        @edit="openEdit"
-        @delete="confirmDelete"
-      />
-    </div>
+    <template v-else>
+      <div v-if="mainPlants.length > 0" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <PlantCard
+          v-for="plant in mainPlants"
+          :key="plant.id"
+          :plant="plant"
+          @edit="openEdit"
+          @delete="confirmDelete"
+        />
+      </div>
+      <p v-else class="text-gray-500 text-sm">No plants match your search.</p>
+
+      <div v-if="collapsedPlants.length > 0" class="mt-6">
+        <button
+          @click="collapsedOpen = !collapsedOpen"
+          class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700"
+        >
+          <span>{{ collapsedOpen ? '▾' : '▸' }}</span>
+          {{ collapsedPlants.length }} plant{{ collapsedPlants.length !== 1 ? 's' : '' }} not in active collection
+        </button>
+        <div v-if="collapsedOpen" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-4">
+          <PlantCard
+            v-for="plant in collapsedPlants"
+            :key="plant.id"
+            :plant="plant"
+            @edit="openEdit"
+            @delete="confirmDelete"
+          />
+        </div>
+      </div>
+    </template>
 
     <PlantModal
       v-if="showCreate"
@@ -83,6 +105,7 @@ const store = usePlantsStore()
 const showCreate = ref(false)
 const editingPlant = ref(null)
 const deletingPlant = ref(null)
+const collapsedOpen = ref(false)
 
 const { daysSince } = useDateFormat()
 
@@ -132,6 +155,9 @@ const displayedPlants = computed(() => {
     return a.name.localeCompare(b.name)
   })
 })
+
+const mainPlants = computed(() => displayedPlants.value.filter(p => !p.status_collapse_in_list))
+const collapsedPlants = computed(() => displayedPlants.value.filter(p => p.status_collapse_in_list))
 
 onMounted(() => store.fetchAll())
 

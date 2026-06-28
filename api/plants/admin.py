@@ -12,7 +12,7 @@ from .admin_filters import (
     UserDropdownFilter,
 )
 from .forms import LocationChoiceField, location_queryset, LOCATION_SELECT_RELATED
-from .models import Location, Plant, PlantImage, PlantCareLog
+from .models import Location, Plant, PlantImage, PlantCareLog, PlantStatus
 
 _PATH_SORT_SEP = Value('\x1f')
 _PATH_SORT_EMPTY = Value('')
@@ -29,6 +29,11 @@ def annotate_fk_path_sort(queryset, relation_prefix, annotation_name):
             output_field=CharField(),
         ),
     })
+
+
+@admin.register(PlantStatus)
+class PlantStatusAdmin(ModelAdmin):
+    list_display = ['name', 'collapse_in_list']
 
 
 @admin.register(Location)
@@ -77,7 +82,7 @@ class PlantAdmin(ModelAdmin):
     actions = [recompute_watering_intervals]
     list_filter_submit = True
     list_display = [
-        'name', 'scientific_name', 'location_path', 'user',
+        'name', 'scientific_name', 'location_path', 'status', 'user',
         'last_watered', 'last_repotted', 'watering_interval_days', 'created_at',
     ]
     list_filter = [
@@ -98,6 +103,7 @@ class PlantAdmin(ModelAdmin):
             'location__parent',
             'location__parent__parent',
             'location__parent__parent__parent',
+            'status',
         )
         last_watered = Subquery(
             PlantCareLog.objects.filter(plant=OuterRef('pk'), type='watered')

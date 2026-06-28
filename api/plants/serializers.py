@@ -1,6 +1,12 @@
 from rest_framework import serializers
 from django.urls import reverse
-from .models import Location, Plant, PlantImage, PlantCareLog
+from .models import Location, Plant, PlantImage, PlantCareLog, PlantStatus
+
+
+class PlantStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlantStatus
+        fields = ['id', 'name', 'collapse_in_list']
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -74,6 +80,14 @@ class PlantSerializer(serializers.ModelSerializer):
         required=False,
         allow_null=True,
     )
+    status = PlantStatusSerializer(read_only=True)
+    status_id = serializers.PrimaryKeyRelatedField(
+        source='status',
+        queryset=PlantStatus.objects.all(),
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
     thumbnail_image_id = serializers.PrimaryKeyRelatedField(
         source='thumbnail_image',
         queryset=PlantImage.objects.none(),
@@ -88,6 +102,7 @@ class PlantSerializer(serializers.ModelSerializer):
             'id', 'name', 'scientific_name',
             'watering_interval_days', 'last_watered',
             'location', 'location_id',
+            'status', 'status_id',
             'thumbnail_image_id',
             'images', 'created_at', 'updated_at',
         ]
@@ -110,6 +125,9 @@ class PlantListSerializer(serializers.ModelSerializer):
     last_repotted = serializers.DateTimeField(read_only=True, allow_null=True)
     thumbnail = serializers.SerializerMethodField()
     full_image = serializers.SerializerMethodField()
+    status_id = serializers.IntegerField(source='status.id', read_only=True, allow_null=True, default=None)
+    status_name = serializers.CharField(source='status.name', read_only=True, allow_null=True, default=None)
+    status_collapse_in_list = serializers.BooleanField(source='status.collapse_in_list', read_only=True, default=False)
 
     class Meta:
         model = Plant
@@ -118,6 +136,7 @@ class PlantListSerializer(serializers.ModelSerializer):
             'watering_interval_days',
             'location_name', 'location_display_name', 'location_path_names', 'location_skip_watering',
             'last_watered', 'last_repotted',
+            'status_id', 'status_name', 'status_collapse_in_list',
             'thumbnail', 'full_image',
             'created_at', 'updated_at',
         ]

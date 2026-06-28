@@ -5,11 +5,16 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.db.models import OuterRef, Subquery
 
 from .forms import LOCATION_SELECT_RELATED
-from .models import Location, Plant, PlantImage, PlantCareLog
+from .models import Location, Plant, PlantImage, PlantCareLog, PlantStatus
 from .serializers import (
     LocationSerializer, PlantSerializer, PlantListSerializer,
-    PlantImageSerializer, PlantCareLogSerializer,
+    PlantImageSerializer, PlantCareLogSerializer, PlantStatusSerializer,
 )
+
+
+class PlantStatusViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = PlantStatusSerializer
+    queryset = PlantStatus.objects.all()
 
 
 class LocationViewSet(viewsets.ModelViewSet):
@@ -54,6 +59,7 @@ class PlantViewSet(viewsets.ModelViewSet):
                 'location__parent__parent',
                 'location__parent__parent__parent',
                 'thumbnail_image',
+                'status',
             )
             .annotate(last_watered=last_watered, last_repotted=last_repotted)
             .order_by('name')

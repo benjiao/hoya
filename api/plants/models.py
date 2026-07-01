@@ -78,6 +78,7 @@ class Plant(models.Model):
     name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255, blank=True)
     watering_interval_days = models.FloatField(null=True, blank=True)
+    fertilizing_interval_days = models.FloatField(null=True, blank=True)
     thumbnail_image = models.ForeignKey(
         'PlantImage', null=True, blank=True, on_delete=models.SET_NULL, related_name='+'
     )
@@ -168,9 +169,11 @@ class PlantImage(models.Model):
 class PlantCareLog(models.Model):
     WATERED = 'watered'
     REPOTTED = 'repotted'
+    FERTILIZED = 'fertilized'
     TYPE_CHOICES = [
         (WATERED, 'Watered'),
         (REPOTTED, 'Repotted'),
+        (FERTILIZED, 'Fertilized'),
     ]
 
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name='care_logs')

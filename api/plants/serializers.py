@@ -95,18 +95,20 @@ class PlantSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     last_watered = serializers.DateTimeField(read_only=True, allow_null=True)
+    last_fertilized = serializers.DateTimeField(read_only=True, allow_null=True)
 
     class Meta:
         model = Plant
         fields = [
             'id', 'name', 'scientific_name',
             'watering_interval_days', 'last_watered',
+            'fertilizing_interval_days', 'last_fertilized',
             'location', 'location_id',
             'status', 'status_id',
             'thumbnail_image_id',
             'images', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['created_at', 'updated_at', 'watering_interval_days', 'last_watered']
+        read_only_fields = ['created_at', 'updated_at', 'watering_interval_days', 'last_watered', 'fertilizing_interval_days', 'last_fertilized']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -123,6 +125,7 @@ class PlantListSerializer(serializers.ModelSerializer):
     location_skip_watering = serializers.BooleanField(source='location.skip_watering', read_only=True, default=False)
     last_watered = serializers.DateTimeField(read_only=True, allow_null=True)
     last_repotted = serializers.DateTimeField(read_only=True, allow_null=True)
+    last_fertilized = serializers.DateTimeField(read_only=True, allow_null=True)
     thumbnail = serializers.SerializerMethodField()
     full_image = serializers.SerializerMethodField()
     status_id = serializers.IntegerField(source='status.id', read_only=True, allow_null=True, default=None)
@@ -133,14 +136,14 @@ class PlantListSerializer(serializers.ModelSerializer):
         model = Plant
         fields = [
             'id', 'name', 'scientific_name',
-            'watering_interval_days',
+            'watering_interval_days', 'fertilizing_interval_days',
             'location_name', 'location_display_name', 'location_path_names', 'location_skip_watering',
-            'last_watered', 'last_repotted',
+            'last_watered', 'last_repotted', 'last_fertilized',
             'status_id', 'status_name', 'status_collapse_in_list',
             'thumbnail', 'full_image',
             'created_at', 'updated_at',
         ]
-        read_only_fields = ['created_at', 'updated_at', 'watering_interval_days']
+        read_only_fields = ['created_at', 'updated_at', 'watering_interval_days', 'fertilizing_interval_days']
 
     def _resolve_thumbnail_image(self, obj):
         return obj.thumbnail_image if obj.thumbnail_image_id else obj.images.order_by('uploaded_at').first()

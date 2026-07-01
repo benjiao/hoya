@@ -9,6 +9,7 @@
         >
           <option :value="null">— General note —</option>
           <option value="watered">Watered</option>
+          <option value="fertilized">Fertilized</option>
           <option value="repotted">Repotted</option>
         </select>
       </div>

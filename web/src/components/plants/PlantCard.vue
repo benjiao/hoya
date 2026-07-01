@@ -76,6 +76,11 @@
             class="inline-flex items-center text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5"
             :title="shortDate(plant.last_watered)"
           >Watered {{ relativeTime(plant.last_watered) }}</span>
+          <span
+            v-if="plant.last_fertilized"
+            class="inline-flex items-center text-xs bg-green-50 text-green-700 rounded-full px-2 py-0.5"
+            :title="shortDate(plant.last_fertilized)"
+          >Fertilized {{ relativeTime(plant.last_fertilized) }}</span>
         </div>
       </div>
     </div>
@@ -90,6 +95,19 @@
         class="h-full transition-all duration-300"
         :class="wateringProgressColor"
         :style="{ width: wateringProgressPct + '%' }"
+      />
+    </div>
+
+    <!-- Fertilizing progress bar -->
+    <div
+      v-if="fertilizingProgress !== null"
+      class="h-1.5 bg-gray-100"
+      :title="fertilizingProgressTitle"
+    >
+      <div
+        class="h-full transition-all duration-300"
+        :class="fertilizingProgressColor"
+        :style="{ width: fertilizingProgressPct + '%' }"
       />
     </div>
   </div>
@@ -142,5 +160,39 @@ const wateringProgressTitle = computed(() => {
   if (remaining === 0) return `Due today (every ${interval} days)`
   if (remaining < 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} (every ${interval} days)`
   return `Due in ${remaining} day${remaining !== 1 ? 's' : ''} (every ${interval} days)`
+})
+
+const fertilizingProgress = computed(() => {
+  if (!props.plant.fertilizing_interval_days || !props.plant.last_fertilized) return null
+  return daysSince(props.plant.last_fertilized) / props.plant.fertilizing_interval_days
+})
+
+const fertilizingProgressPct = computed(() => {
+  if (fertilizingProgress.value === null) return 0
+  const days = daysSince(props.plant.last_fertilized)
+  const remaining = Math.round(props.plant.fertilizing_interval_days - days)
+  if (days === 0 || remaining === 0) return 100
+  return Math.min(fertilizingProgress.value * 100, 100)
+})
+
+const fertilizingProgressColor = computed(() => {
+  if (fertilizingProgress.value === null) return ''
+  const days = daysSince(props.plant.last_fertilized)
+  const remaining = Math.round(props.plant.fertilizing_interval_days - days)
+  if (days === 0) return 'bg-green-400'
+  if (remaining === 0) return 'bg-red-400'
+  if (fertilizingProgress.value >= 1) return 'bg-red-400'
+  if (fertilizingProgress.value >= 0.75) return 'bg-amber-400'
+  return 'bg-green-400'
+})
+
+const fertilizingProgressTitle = computed(() => {
+  if (fertilizingProgress.value === null) return ''
+  const days = daysSince(props.plant.last_fertilized)
+  const interval = props.plant.fertilizing_interval_days
+  const remaining = Math.round(interval - days)
+  if (remaining === 0) return `Fertilize today (every ${interval} days)`
+  if (remaining < 0) return `Fertilizing overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} (every ${interval} days)`
+  return `Fertilize in ${remaining} day${remaining !== 1 ? 's' : ''} (every ${interval} days)`
 })
 </script>

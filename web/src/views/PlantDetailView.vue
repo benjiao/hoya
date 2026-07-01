@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <section v-if="wateringProgress !== null" class="mb-6">
+    <section v-if="wateringProgress !== null" class="mb-4">
       <div class="flex items-center justify-between mb-1.5">
         <span class="text-sm font-medium text-gray-700">Watering</span>
         <span class="text-xs text-gray-500">{{ wateringProgressLabel }}</span>
@@ -27,6 +27,20 @@
           class="h-full rounded-full transition-all duration-300"
           :class="wateringProgressColor"
           :style="{ width: wateringProgressPct + '%' }"
+        />
+      </div>
+    </section>
+
+    <section v-if="fertilizingProgress !== null" class="mb-6">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-sm font-medium text-gray-700">Fertilizing</span>
+        <span class="text-xs text-gray-500">{{ fertilizingProgressLabel }}</span>
+      </div>
+      <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div
+          class="h-full rounded-full transition-all duration-300"
+          :class="fertilizingProgressColor"
+          :style="{ width: fertilizingProgressPct + '%' }"
         />
       </div>
     </section>
@@ -117,6 +131,42 @@ const wateringProgressLabel = computed(() => {
   if (!p?.watering_interval_days || !p?.last_watered) return ''
   const days = daysSince(p.last_watered)
   const interval = p.watering_interval_days
+  const remaining = Math.round(interval - days)
+  if (remaining === 0) return `Due today · every ${interval} days`
+  if (remaining < 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} · every ${interval} days`
+  return `${days} of ${interval} days · due in ${remaining} day${remaining !== 1 ? 's' : ''}`
+})
+
+const fertilizingProgress = computed(() => {
+  const p = plant.value
+  if (!p?.fertilizing_interval_days || !p?.last_fertilized) return null
+  return daysSince(p.last_fertilized) / p.fertilizing_interval_days
+})
+
+const fertilizingProgressPct = computed(() => {
+  if (fertilizingProgress.value === null) return 0
+  const days = daysSince(plant.value?.last_fertilized)
+  const remaining = Math.round((plant.value?.fertilizing_interval_days ?? 0) - days)
+  if (days === 0 || remaining === 0) return 100
+  return Math.min(fertilizingProgress.value * 100, 100)
+})
+
+const fertilizingProgressColor = computed(() => {
+  if (fertilizingProgress.value === null) return ''
+  const days = daysSince(plant.value?.last_fertilized)
+  const remaining = Math.round((plant.value?.fertilizing_interval_days ?? 0) - days)
+  if (days === 0) return 'bg-green-400'
+  if (remaining === 0) return 'bg-red-400'
+  if (fertilizingProgress.value >= 1) return 'bg-red-400'
+  if (fertilizingProgress.value >= 0.75) return 'bg-amber-400'
+  return 'bg-green-400'
+})
+
+const fertilizingProgressLabel = computed(() => {
+  const p = plant.value
+  if (!p?.fertilizing_interval_days || !p?.last_fertilized) return ''
+  const days = daysSince(p.last_fertilized)
+  const interval = p.fertilizing_interval_days
   const remaining = Math.round(interval - days)
   if (remaining === 0) return `Due today · every ${interval} days`
   if (remaining < 0) return `Overdue by ${Math.abs(remaining)} day${Math.abs(remaining) !== 1 ? 's' : ''} · every ${interval} days`

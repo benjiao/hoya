@@ -77,9 +77,17 @@ def recompute_watering_intervals(modeladmin, request, queryset):
     modeladmin.message_user(request, f'Recomputing watering intervals for {len(pks)} plant(s).')
 
 
+@admin.action(description='Recompute fertilizing intervals')
+def recompute_fertilizing_intervals(modeladmin, request, queryset):
+    from .tasks import compute_fertilizing_intervals
+    pks = list(queryset.values_list('pk', flat=True))
+    compute_fertilizing_intervals.delay(plant_pks=pks)
+    modeladmin.message_user(request, f'Recomputing fertilizing intervals for {len(pks)} plant(s).')
+
+
 @admin.register(Plant)
 class PlantAdmin(ModelAdmin):
-    actions = [recompute_watering_intervals]
+    actions = [recompute_watering_intervals, recompute_fertilizing_intervals]
     list_filter_submit = True
     list_display = [
         'name', 'scientific_name', 'location_path', 'status', 'user',

@@ -51,6 +51,10 @@ class PlantViewSet(viewsets.ModelViewSet):
             PlantCareLog.objects.filter(plant=OuterRef('pk'), type='repotted')
             .order_by('-logged_at').values('logged_at')[:1]
         )
+        last_fertilized = Subquery(
+            PlantCareLog.objects.filter(plant=OuterRef('pk'), type='fertilized')
+            .order_by('-logged_at').values('logged_at')[:1]
+        )
         return (
             Plant.objects.filter(user=self.request.user)
             .select_related(
@@ -61,7 +65,7 @@ class PlantViewSet(viewsets.ModelViewSet):
                 'thumbnail_image',
                 'status',
             )
-            .annotate(last_watered=last_watered, last_repotted=last_repotted)
+            .annotate(last_watered=last_watered, last_repotted=last_repotted, last_fertilized=last_fertilized)
             .order_by('name')
         )
 

@@ -23,7 +23,7 @@ export function useDateFormat() {
     const days = Math.round((nowMidnight - thenMidnight) / 86400000)
     if (days === 0) return 'Today'
     if (days === 1) return 'Yesterday'
-    if (days < 30) return `${days} days ago`
+    if (days < 30) return `${days}d ago`
     if (days < 365) return `${Math.floor(days / 30)}mo ago`
     return `${Math.floor(days / 365)}y ago`
   }

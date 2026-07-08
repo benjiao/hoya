@@ -75,7 +75,7 @@
             v-if="plant.last_watered && !plant.location_skip_watering"
             class="inline-flex items-center text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5"
             :title="shortDate(plant.last_watered)"
-          >Watered {{ relativeTime(plant.last_watered) }}</span>
+          >Watered {{ relativeTimeDays(plant.last_watered) }}</span>
           <span
             v-if="plant.last_fertilized"
             class="inline-flex items-center text-xs bg-green-50 text-green-700 rounded-full px-2 py-0.5"
@@ -120,7 +120,7 @@ import { useDateFormat } from '@/composables/useDateFormat'
 const props = defineProps({ plant: Object })
 defineEmits(['edit', 'delete'])
 
-const { relativeTime, shortDate, daysSince } = useDateFormat()
+const { relativeTime, relativeTimeDays, shortDate, daysSince } = useDateFormat()
 
 const lightbox = ref(false)
 function onKeydown(e) { if (e.key === 'Escape') lightbox.value = false }

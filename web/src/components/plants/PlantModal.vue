@@ -17,6 +17,14 @@
         />
       </div>
       <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Propagation date</label>
+        <input
+          v-model="form.propagation_date"
+          type="date"
+          class="w-full rounded-md border-gray-300 shadow-sm focus:ring-brand-500 focus:border-brand-500"
+        />
+      </div>
+      <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
         <select
           v-model="form.location_id"
@@ -81,7 +89,8 @@ const { loading, error, run } = useApiRequest()
 const form = reactive({
   name: props.plant?.name || '',
   scientific_name: props.plant?.scientific_name || '',
-  location_id: props.plant?.location?.id ?? null,
+  propagation_date: props.plant?.propagation_date || '',
+  location_id: props.plant?.location?.id ?? props.plant?.location_id ?? null,
   status_id: props.plant?.status?.id ?? props.plant?.status_id ?? null,
 })
 
@@ -91,10 +100,11 @@ onMounted(() => {
 })
 
 async function submit() {
+  const payload = { ...form, propagation_date: form.propagation_date || null }
   await run(() =>
     props.plant
-      ? plantsStore.update(props.plant.id, form)
-      : plantsStore.create(form)
+      ? plantsStore.update(props.plant.id, payload)
+      : plantsStore.create(payload)
   ).catch(() => {})
   if (!error.value) emit('saved')
 }

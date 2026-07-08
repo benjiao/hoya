@@ -10,6 +10,9 @@
         <h1 class="text-2xl font-bold text-gray-900 mt-1">{{ plant.name }}</h1>
         <p v-if="plant.scientific_name" class="text-sm italic text-gray-400">{{ plant.scientific_name }}</p>
         <p v-if="plant.location" class="text-sm text-gray-500 mt-1">{{ plant.location.display_name }}</p>
+        <p v-if="plant.propagation_date" class="text-sm text-gray-500 mt-1">
+          Propagated {{ shortDate(plant.propagation_date) }}
+        </p>
       </div>
       <div class="flex gap-2 flex-shrink-0">
         <button @click="showEdit = true" class="text-sm text-brand-600 hover:underline">Edit</button>
@@ -99,7 +102,7 @@ const props = defineProps({ id: String })
 const store = usePlantsStore()
 const router = useRouter()
 const plant = computed(() => store.currentPlant)
-const { daysSince } = useDateFormat()
+const { daysSince, shortDate } = useDateFormat()
 
 const wateringProgress = computed(() => {
   const p = plant.value

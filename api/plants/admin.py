@@ -91,7 +91,7 @@ class PlantAdmin(ModelAdmin):
     list_filter_submit = True
     list_display = [
         'name', 'scientific_name', 'location_path', 'status', 'user',
-        'last_watered', 'last_repotted', 'watering_interval_days', 'created_at',
+        'propagation_date', 'last_watered', 'last_repotted', 'watering_interval_days', 'created_at',
     ]
     list_filter = [
         ('name', AllValuesCheckboxFilter),

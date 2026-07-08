@@ -45,7 +45,21 @@ export const usePlantsStore = defineStore('plants', () => {
     const { data } = await client.patch(`plants/${id}/`, payload)
     if (currentPlant.value?.id === id) currentPlant.value = data
     const idx = plants.value.findIndex(p => p.id === id)
-    if (idx !== -1) plants.value[idx] = { ...plants.value[idx], ...data }
+    if (idx !== -1) {
+      // The detail response nests location/status; the list shape needs the flat fields those cards read.
+      plants.value[idx] = {
+        ...plants.value[idx],
+        ...data,
+        location_id: data.location?.id ?? null,
+        location_name: data.location?.name ?? null,
+        location_display_name: data.location?.display_name ?? null,
+        location_path_names: data.location?.path_names ?? null,
+        location_skip_watering: data.location?.skip_watering ?? false,
+        status_id: data.status?.id ?? null,
+        status_name: data.status?.name ?? null,
+        status_collapse_in_list: data.status?.collapse_in_list ?? false,
+      }
+    }
     return data
   }
 

@@ -100,7 +100,7 @@ class PlantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
         fields = [
-            'id', 'name', 'scientific_name',
+            'id', 'name', 'scientific_name', 'propagation_date',
             'watering_interval_days', 'last_watered',
             'fertilizing_interval_days', 'last_fertilized',
             'location', 'location_id',
@@ -119,6 +119,7 @@ class PlantSerializer(serializers.ModelSerializer):
 
 
 class PlantListSerializer(serializers.ModelSerializer):
+    location_id = serializers.IntegerField(source='location.id', read_only=True, allow_null=True, default=None)
     location_name = serializers.CharField(source='location.name', read_only=True, default=None)
     location_display_name = serializers.SerializerMethodField()
     location_path_names = serializers.SerializerMethodField()
@@ -135,9 +136,9 @@ class PlantListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
         fields = [
-            'id', 'name', 'scientific_name',
+            'id', 'name', 'scientific_name', 'propagation_date',
             'watering_interval_days', 'fertilizing_interval_days',
-            'location_name', 'location_display_name', 'location_path_names', 'location_skip_watering',
+            'location_id', 'location_name', 'location_display_name', 'location_path_names', 'location_skip_watering',
             'last_watered', 'last_repotted', 'last_fertilized',
             'status_id', 'status_name', 'status_collapse_in_list',
             'thumbnail', 'full_image',

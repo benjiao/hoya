@@ -77,6 +77,7 @@ class Plant(models.Model):
     )
     name = models.CharField(max_length=255)
     scientific_name = models.CharField(max_length=255, blank=True)
+    propagation_date = models.DateField(null=True, blank=True)
     watering_interval_days = models.FloatField(null=True, blank=True)
     fertilizing_interval_days = models.FloatField(null=True, blank=True)
     thumbnail_image = models.ForeignKey(

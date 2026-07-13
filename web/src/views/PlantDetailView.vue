@@ -53,6 +53,24 @@
       <PlantImages :plant="plant" />
     </section>
 
+    <section class="mb-8">
+      <h2 class="text-base font-semibold text-gray-800 mb-3">Notes</h2>
+      <textarea
+        v-model="notesDraft"
+        rows="4"
+        placeholder="Jot down anything worth remembering about this plant…"
+        class="w-full rounded-md border-gray-300 shadow-sm focus:ring-brand-500 focus:border-brand-500 text-sm"
+      ></textarea>
+      <div class="flex items-center justify-end mt-2">
+        <button
+          v-if="notesDirty"
+          @click="saveNotes"
+          :disabled="notesSaving"
+          class="text-sm bg-brand-600 hover:bg-brand-700 text-white px-3 py-1 rounded-md disabled:opacity-50"
+        >{{ notesSaving ? 'Saving…' : 'Save' }}</button>
+      </div>
+    </section>
+
     <section>
       <div class="flex items-center justify-between mb-3">
         <h2 class="text-base font-semibold text-gray-800">Care log</h2>
@@ -86,7 +104,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePlantsStore } from '@/stores/plants'
 import { useDateFormat } from '@/composables/useDateFormat'
@@ -179,6 +197,21 @@ const showEdit = ref(false)
 const showLog = ref(false)
 const showDelete = ref(false)
 const careLogRef = ref(null)
+const notesDraft = ref('')
+const notesSaving = ref(false)
+
+watch(plant, (p) => { if (p) notesDraft.value = p.notes || '' }, { immediate: true })
+
+const notesDirty = computed(() => notesDraft.value !== (plant.value?.notes || ''))
+
+async function saveNotes() {
+  notesSaving.value = true
+  try {
+    await store.update(plant.value.id, { notes: notesDraft.value })
+  } finally {
+    notesSaving.value = false
+  }
+}
 
 onMounted(() => store.fetchOne(props.id))
 

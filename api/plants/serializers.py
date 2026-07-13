@@ -106,6 +106,7 @@ class PlantSerializer(serializers.ModelSerializer):
             'location', 'location_id',
             'status', 'status_id',
             'thumbnail_image_id',
+            'notes',
             'images', 'created_at', 'updated_at',
         ]
         read_only_fields = ['created_at', 'updated_at', 'watering_interval_days', 'last_watered', 'fertilizing_interval_days', 'last_fertilized']

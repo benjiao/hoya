@@ -42,7 +42,7 @@
           :key="plant.id"
           :plant="plant"
           @edit="openEdit"
-          @delete="confirmDelete"
+          @duplicate="handleDuplicate"
         />
       </div>
       <p v-else class="text-gray-500 text-sm">No plants match your search.</p>
@@ -61,7 +61,7 @@
             :key="plant.id"
             :plant="plant"
             @edit="openEdit"
-            @delete="confirmDelete"
+            @duplicate="handleDuplicate"
           />
         </div>
       </div>
@@ -79,12 +79,6 @@
       @close="editingPlant = null"
       @saved="editingPlant = null"
     />
-    <ConfirmDialog
-      v-if="deletingPlant"
-      :message="`Delete '${deletingPlant.name}'? This cannot be undone.`"
-      @confirm="doDelete"
-      @cancel="deletingPlant = null"
-    />
   </div>
 </template>
 
@@ -97,14 +91,12 @@ import PlantCard from '@/components/plants/PlantCard.vue'
 import PlantModal from '@/components/plants/PlantModal.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ErrorBanner from '@/components/ui/ErrorBanner.vue'
-import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = usePlantsStore()
 const showCreate = ref(false)
 const editingPlant = ref(null)
-const deletingPlant = ref(null)
 const collapsedOpen = ref(false)
 
 const { daysSince } = useDateFormat()
@@ -162,9 +154,8 @@ const collapsedPlants = computed(() => displayedPlants.value.filter(p => p.statu
 onMounted(() => store.fetchAll())
 
 function openEdit(plant) { editingPlant.value = plant }
-function confirmDelete(plant) { deletingPlant.value = plant }
-async function doDelete() {
-  await store.remove(deletingPlant.value.id)
-  deletingPlant.value = null
+async function handleDuplicate(plant) {
+  const newId = await store.duplicate(plant.id)
+  editingPlant.value = store.plants.find(p => p.id === newId)
 }
 </script>

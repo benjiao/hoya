@@ -49,15 +49,29 @@
               {{ plant.scientific_name }}
             </p>
           </div>
-          <div class="flex gap-1 flex-shrink-0" @click.stop>
+          <div class="flex-shrink-0 relative" @click.stop>
             <button
-              @click="$emit('edit', plant)"
-              class="text-gray-400 hover:text-brand-600 text-xs px-1"
-            >Edit</button>
-            <button
-              @click="$emit('delete', plant)"
-              class="text-gray-400 hover:text-red-500 text-xs px-1"
-            >Delete</button>
+              ref="menuBtn"
+              @click="toggleMenu"
+              class="text-gray-400 hover:text-gray-600 text-sm leading-none px-1.5 py-1 rounded hover:bg-gray-100"
+            >⋮</button>
+            <Teleport to="body">
+              <div v-if="menuOpen" class="fixed inset-0 z-40" @click="menuOpen = false"></div>
+              <div
+                v-if="menuOpen"
+                class="fixed z-50 bg-white rounded-md shadow-lg border border-gray-100 py-1 w-32"
+                :style="{ top: menuPos.top + 'px', left: menuPos.left + 'px' }"
+              >
+                <button
+                  @click="onEdit"
+                  class="block w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                >Edit</button>
+                <button
+                  @click="onDuplicate"
+                  class="block w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+                >Duplicate</button>
+              </div>
+            </Teleport>
           </div>
         </div>
 
@@ -118,14 +132,43 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useDateFormat } from '@/composables/useDateFormat'
 
 const props = defineProps({ plant: Object })
-defineEmits(['edit', 'delete'])
+const emit = defineEmits(['edit', 'duplicate'])
 
 const { relativeTime, relativeTimeDays, shortDate, daysSince } = useDateFormat()
 
 const lightbox = ref(false)
-function onKeydown(e) { if (e.key === 'Escape') lightbox.value = false }
+const menuOpen = ref(false)
+const menuBtn = ref(null)
+const menuPos = ref({ top: 0, left: 0 })
+
+function onKeydown(e) {
+  if (e.key === 'Escape') {
+    lightbox.value = false
+    menuOpen.value = false
+  }
+}
 onMounted(() => window.addEventListener('keydown', onKeydown))
 onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+
+function toggleMenu() {
+  if (menuOpen.value) {
+    menuOpen.value = false
+    return
+  }
+  const rect = menuBtn.value.getBoundingClientRect()
+  menuPos.value = { top: rect.bottom + 4, left: rect.right - 128 }
+  menuOpen.value = true
+}
+
+function onEdit() {
+  menuOpen.value = false
+  emit('edit', props.plant)
+}
+
+function onDuplicate() {
+  menuOpen.value = false
+  emit('duplicate', props.plant)
+}
 
 const wateringProgress = computed(() => {
   if (!props.plant.watering_interval_days || !props.plant.last_watered || props.plant.location_skip_watering) return null

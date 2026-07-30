@@ -69,6 +69,12 @@ export const usePlantsStore = defineStore('plants', () => {
     if (currentPlant.value?.id === id) currentPlant.value = null
   }
 
+  async function duplicate(id) {
+    const { data } = await client.post(`plants/${id}/duplicate/`)
+    await fetchAll()
+    return data.id
+  }
+
   async function uploadImage(plantId, file, caption = '') {
     const form = new FormData()
     form.append('image', file)
@@ -116,7 +122,7 @@ export const usePlantsStore = defineStore('plants', () => {
 
   return {
     plants, currentPlant, loading, error,
-    fetchAll, fetchOne, create, update, remove,
+    fetchAll, fetchOne, create, update, remove, duplicate,
     uploadImage, deleteImage, setThumbnail, fetchLogs, addLog, deleteLog,
   }
 })

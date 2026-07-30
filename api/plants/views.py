@@ -77,6 +77,17 @@ class PlantViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=True, methods=['post'], url_path='duplicate')
+    def duplicate(self, request, pk=None):
+        plant = self.get_object()
+        clone = Plant.objects.create(
+            user=request.user,
+            name=Plant.next_duplicate_name(plant.name),
+            scientific_name=plant.scientific_name,
+        )
+        serializer = PlantSerializer(clone, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     @action(detail=True, methods=['get', 'post'], url_path='images',
             parser_classes=[MultiPartParser, FormParser])
     def images(self, request, pk=None):

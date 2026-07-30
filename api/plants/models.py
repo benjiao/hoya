@@ -68,6 +68,8 @@ class PlantStatus(models.Model):
 
 
 class Plant(models.Model):
+    NAME_SUFFIX_RE = re.compile(r'^(.*) #(\d+)$')
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='plants')
     location = models.ForeignKey(
         Location, null=True, blank=True, on_delete=models.SET_NULL, related_name='plants'
@@ -89,6 +91,14 @@ class Plant(models.Model):
 
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def next_duplicate_name(name):
+        match = Plant.NAME_SUFFIX_RE.match(name)
+        if match:
+            base, num = match.group(1), int(match.group(2))
+            return f'{base} #{num + 1}'
+        return f'{name} #2'
 
 
 def _extract_exif_datetime(image_field):
